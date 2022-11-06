@@ -31,10 +31,48 @@ def calculate_demographic_data(print_data=True):
     # What percentage of the people who work the minimum number of hours per week have a salary of >50K?
     num_min_workers = df.loc[df['hours-per-week'] == min_work_hours]
     rich_percentage = round(len(num_min_workers[num_min_workers['salary'] == '>50K']) / len(num_min_workers) * 100, 1)
-
+    
+    # Add : 各国毎のレコード数
+    country_groups = df.groupby('native-country').count()
+    
+    # Add : 給料が「>50K」のレコード数
+    country_riches = df[df['salary'] == '>50K'].groupby('native-country').count()
+    
+    # Add : 列削除
+    country_groups = country_groups.drop([
+        'age',
+        'workclass',
+        'fnlwgt',
+        'education',
+        'education-num',
+        'marital-status',
+        'occupation',
+        'relationship',
+        'race',
+        'sex',
+        'capital-gain',
+        'capital-loss',
+        'hours-per-week'
+    ], axis=1)
+    
+    # Add : 列名変更
+    country_groups = country_groups.rename(columns={'salary': 'count1'})
+    
+    # Add : 列追加
+    country_groups['count2'] = country_riches['age']
+    
+    # Add : 給料が「>50K」のレコード数の割合(%)を計算
+    country_groups['percent'] = round(country_groups['count2'] / country_groups['count1'] * 100, 1)
+    
+    # Add : 割合(%)が最大の国はどこか?
+    country_groups = country_groups.loc[country_groups['percent'] == country_groups['percent'].max()]
+    
+    # Add : 索引削除
+    country_groups = country_groups.reset_index()
+    
     # What country has the highest percentage of people that earn >50K?
-    highest_earning_country = None
-    highest_earning_country_percentage = None
+    highest_earning_country = country_groups['native-country'][0]
+    highest_earning_country_percentage = country_groups['percent'][0]
 
     # Identify the most popular occupation for those who earn >50K in India.
     top_IN_occupation = None
