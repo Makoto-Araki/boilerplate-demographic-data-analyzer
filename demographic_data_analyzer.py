@@ -6,7 +6,7 @@ def calculate_demographic_data(print_data=True):
     df = pd.read_csv('adult.data.csv')
     
     # How many of each race are represented in this dataset? This should be a Pandas series with race names as the index labels.
-    race_count = df['race'].value_counts().to_list()
+    race_count = df['race'].value_counts()
 
     # What is the average age of men?
     average_age_men = round(df.loc[df['sex'] == 'Male', 'age'].mean(), 1)
@@ -75,7 +75,7 @@ def calculate_demographic_data(print_data=True):
     highest_earning_country_percentage = country_groups['percent'][0]
 
     # Identify the most popular occupation for those who earn >50K in India.
-    top_IN_occupation = None
+    top_IN_occupation = df.loc[(df['native-country'] == 'India') & (df['salary'] == '>50K')]['occupation'].value_counts().index[0]
 
     # DO NOT MODIFY BELOW THIS LINE
 
